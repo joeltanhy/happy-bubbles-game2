@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#1a153b">
+  <meta name="description" content="Happy Bubbles — collect therapeutic cards and help anxious bubbles in a dreamy pixel world. A Psych SIG educational game.">
+  <title>Happy Bubbles · Psych SIG</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app" id="app">
+    <header class="brand" aria-label="Psych SIG Happy Bubbles">
+      <div class="sigline"><span>✧</span> PSYCH <span class="brain-mark" aria-hidden="true">☁</span> SIG <span>✧</span></div>
+      <h1>HAPPY <span>BUBBLES</span></h1>
+      <div class="brand-rule"><span>✦</span></div>
+    </header>
+
+    <section class="game-shell" aria-label="Happy Bubbles game">
+      <canvas id="world" aria-label="Dreamy overworld to explore" tabindex="0"></canvas>
+      <div class="map-hud" id="mapHud" hidden>
+        <div class="hud-left-stack">
+          <div class="score-panel">
+            <div class="score-pill"><span class="score-orb">☺</span><span class="score-copy">BUBBLES TREATED</span><span id="score">0</span></div>
+            <div class="card-strip" id="cardStrip" aria-label="Card counts">
+              <div class="card-chip gentle"><span class="dot"></span><span class="label">GR</span><strong id="countGentle">0</strong></div>
+              <div class="card-chip validation"><span class="dot"></span><span class="label">VA</span><strong id="countValidation">0</strong></div>
+              <div class="card-chip grounding"><span class="dot"></span><span class="label">GO</span><strong id="countGrounding">0</strong></div>
+              <div class="card-chip steps"><span class="dot"></span><span class="label">SS</span><strong id="countSteps">0</strong></div>
+            </div>
+          </div>
+        </div>
+        <div class="hud-right">
+          <button class="mini-button" id="helpBtn" aria-label="Game instructions" title="Help">?</button>
+          <button class="mini-button" id="pauseBtn" aria-label="Pause game" title="Pause">Ⅱ</button>
+        </div>
+      </div>
+      <div class="toast" id="toast" aria-live="polite"></div>
+      <div class="map-prompt" id="mapPrompt" hidden></div>
+
+      <div class="screen intro active" id="intro">
+        <div class="intro-split">
+          <div class="intro-collect">
+            <h2>Collect<br><em>Cards</em></h2>
+            <div class="mini-fan" aria-hidden="true">
+              <img src="card-gentle-reframe.webp" alt="">
+              <img src="card-grounding.webp" alt="">
+              <img src="card-validation.webp" alt="">
+            </div>
+          </div>
+          <div class="intro-heal">
+            <h2>Help<br>Bubbles<br><em>Heal</em></h2>
+            <div class="change-bubbles" aria-hidden="true">
+              <div class="intro-bubble sick">
+                <div class="gloss"></div><div class="bandage"></div><div class="eye eye-l"></div><div class="eye eye-r"></div><div class="mouth"></div>
+              </div>
+              <span class="transform-arrow">➜</span>
+              <div class="intro-bubble happy">
+                <div class="gloss"></div><div class="eye eye-l"></div><div class="eye eye-r"></div><div class="mouth"></div>
+              </div>
+            </div>
+          </div>
+          <button class="play-gem" id="playBtn" aria-label="Start playing"><span>▶</span></button>
+        </div>
+      </div>
+
+      <div class="screen battle" id="battle" hidden aria-label="Bubble conversation">
+        <div class="battle-top">
+          <div class="bubble-label"><small id="battleId">B01</small><strong id="battleTitle">A bubble needs help</strong></div>
+          <button class="exit-battle" id="exitBattle" aria-label="Leave conversation">✕</button>
+        </div>
+        <div class="distress-label"><span>♡ DISTRESS</span><strong id="distressText">100 / 100</strong></div>
+        <div class="meter"><div id="distressFill"></div></div>
+        <div class="battle-illustration">
+          <div class="hero-duel" aria-hidden="true"><div class="hero-hat"></div><div class="hero-head"><i></i><i></i></div><div class="hero-body"></div><div class="hero-wand">✦</div></div>
+          <div class="battle-floor"></div>
+          <div class="battle-aura"></div>
+          <div class="bubble-duel" id="bubbleDuel" aria-hidden="true"><div class="bubble-gloss"></div><div class="bubble-crown"></div><div class="bandage"></div><div class="brow l"></div><div class="brow r"></div><div class="eye l"></div><div class="eye r"></div><div class="mouth"></div><div class="tear"></div><div class="shadow-cheek cheek-l"></div><div class="shadow-cheek cheek-r"></div></div>
+        </div>
+        <div class="thought-box" id="thoughtBox" aria-live="polite">
+          <div class="panel-row played" id="playedRow" hidden>
+            <span class="speaker">CARD PLAYED</span>
+            <p id="greenLine">…</p>
+          </div>
+          <div class="panel-row current">
+            <span class="speaker" id="speaker">BUBBLE'S THOUGHT</span>
+            <p id="thought">…</p>
+          </div>
+          <div class="result-line meta-row"><span id="fitLabel">Choose a card</span><strong id="reliefLabel">−0 distress</strong></div>
+        </div>
+        <div class="cards-title"><span>✦</span> CHOOSE A CARD <span>✦</span></div>
+        <div class="hand" id="hand" aria-label="Your card inventory"></div>
+        <div class="battle-footnote" id="battleFootnote">Select a card, then tap ✦ to play it.</div>
+      </div>
+
+      <div class="screen finished" id="finished" hidden>
+        <div class="finish-sparkles">✧　✦　✧</div>
+        <div class="finish-bubble">☺</div>
+        <h2>BUBBLE BRIGHTENED!</h2>
+        <p id="happyThought"></p>
+        <div class="reward">+1 bubble treated</div>
+        <p class="finish-small" id="finishInsight"></p>
+        <button class="gold-button" id="returnWorld">Return to the world ➜</button>
+      </div>
+
+      <div class="screen pause-overlay" id="pauseOverlay" hidden>
+        <div class="pause-card">
+          <div class="pause-icon">☾</div><h2>Taking a breather?</h2>
+          <p>There is no timer on caring.</p>
+          <button class="gold-button" id="resumeBtn">Resume</button>
+          <button class="subtle-button" id="restartBtn">Start new world</button>
+        </div>
+      </div>
+      <div class="screen pause-overlay" id="helpOverlay" hidden>
+        <div class="pause-card help-card">
+          <h2>How to Play</h2>
+          <p><b>Move:</b> Drag the joystick or use WASD / arrow keys.</p>
+          <p><b>Collect:</b> Stand near a glowing card and tap ✦.</p>
+          <p><b>Help:</b> Touch a troubled bubble, choose a card, and tap ✦ to play it.</p>
+          <p>Different feelings call for different approaches. Cards are consumed when played.</p>
+          <button class="gold-button" id="closeHelp">Got it!</button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="controls" aria-label="Game controls">
+      <div class="joystick-wrap">
+        <div class="joystick-caption">MOVE</div>
+        <div class="joystick-outer" id="joystick" role="group" aria-label="Movement joystick"><div class="arrow top">▲</div><div class="arrow bottom">▼</div><div class="arrow left">◀</div><div class="arrow right">▶</div><div class="joystick-knob" id="joystickKnob"></div></div>
+      </div>
+      <div class="control-side">
+        <div class="control-caption" id="actionHint">BEGIN YOUR JOURNEY</div>
+        <button class="action-button" id="actionBtn" aria-label="Action"><span class="action-spark">✦</span><span class="action-word" id="actionWord">ACTION</span></button>
+      </div>
+    </footer>
+    <div class="tiny-note">A gentle learning game · Not a substitute for mental health care</div>
+  </main>
+  <script src="dialogues.js" defer></script>
+  <script src="game.js" defer></script>
+</body>
+</html>
